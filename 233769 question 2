@@ -1,0 +1,100 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+</Project>
+@page "/quiz"
+@using QuizApp.Data.Models
+
+<h1>Quiz</h1>
+
+<QuestionList Questions="quizQuestions" OnOptionSelected="HandleOptionSelected" />
+
+@if (selectedAnswer != null)
+{
+    <div>
+        <h3>Your answer: @selectedAnswer</h3>
+        <h3>@resultMessage</h3>
+    </div>
+}
+
+@code {
+    private List<Question> quizQuestions = new List<Question>
+    {
+        new Question
+        {
+            Text = "What is the capital of France?",
+            Options = new List<string> { "Berlin", "Madrid", "Paris", "Rome" },
+            CorrectAnswer = "Paris"
+        },
+        new Question
+        {
+            Text = "What is 2 + 2?",
+            Options = new List<string> { "3", "4", "5", "6" },
+            CorrectAnswer = "4"
+        },
+        new Question
+        {
+            Text = "What is the largest planet in our solar system?",
+            Options = new List<string> { "Earth", "Jupiter", "Mars", "Saturn" },
+            CorrectAnswer = "Jupiter"
+        }
+    };
+
+    private string? selectedAnswer;
+    private string resultMessage = string.Empty;
+
+    private void HandleOptionSelected(string selectedOption)
+    {
+        selectedAnswer = selectedOption;
+
+        // Check if the selected answer is correct
+        var currentQuestion = quizQuestions.FirstOrDefault(q => q.Options.Contains(selectedOption));
+        if (currentQuestion != null)
+        {
+            if (selectedOption == currentQuestion.CorrectAnswer)
+            {
+                resultMessage = "Correct!";
+            }
+            else
+            {
+                resultMessage = "Incorrect. The correct answer is: " + currentQuestion.CorrectAnswer;
+            }
+        }
+    }
+}
+@using QuizApp.Data.Models
+
+<div class="question-list">
+    @foreach (var question in Questions)
+    {
+        <QuestionCard Question="question" OnOptionSelected="HandleOptionSelected" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<Question> Questions { get; set; } = new List<Question>();
+
+    private void HandleOptionSelected(string selectedOption)
+    {
+        // Logic to handle the selected option
+        Console.WriteLine($"Selected option: {selectedOption}");
+    }
+}
+// File: Data/Models/Question.cs
+using System.Collections.Generic;
+
+namespace QuizApp.Data.Models
+{
+    public class Question
+    {
+        public string Text { get; set; } = string.Empty; // Default value to avoid null reference
+        public List<string> Options { get; set; } = new List<string>(); // Initialize with an empty list
+        public string CorrectAnswer { get; set; } = string.Empty; // Store the correct answer
+    }
+}
